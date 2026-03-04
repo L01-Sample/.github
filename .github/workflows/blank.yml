@@ -1,0 +1,30 @@
+name: Auto Close Issue on PR Merge
+on:
+  pull_request:
+    types: [closed] # Kích hoạt khi PR đóng (hoặc merge)
+
+jobs:
+  close_issue:
+    # Chỉ chạy nếu PR được merge (chứ không phải đóng mà không merge)
+    if: github.event.pull_request.merged == true 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Gửi thông báo và đóng Ticket
+        uses: actions/github-script@v6
+        with:
+          script: |
+            // Lấy nội dung PR để tìm số Issue ID
+            const prBody = context.payload.pull_request.body;
+            const match = prBody.match(/Closes #(\d+)/);
+            
+            if (match) {
+              const issueNumber = parseInt(match[1], 10);
+              
+              // Tự động comment cảm ơn
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: "🎉 PR đã được merge! Hệ thống tự động đóng Issue này. Cảm ơn sự đóng góp của bạn!"
+              });
+            }
