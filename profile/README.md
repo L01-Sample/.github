@@ -1,4 +1,4 @@
-## Đây là slogan mới
+## Đây là slogan mới lần thứ 2
 
 <!--
 
